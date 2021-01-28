@@ -16,39 +16,48 @@ import java.util.stream.Stream;
 @Component
 public class PDFReportCreator {
 
-    public static final int FONT_SIZE = 14;
-    public static final int ITEM_VARIABLE_HEADER_QUANTITY = 5;
-    public static final int BORDER_WIDTH = 2;
+    private static final int FONT_SIZE = 14;
+    private static final int ITEM_VARIABLE_HEADER_QUANTITY = 5;
+    private static final int BORDER_WIDTH = 2;
 
     public ByteArrayInputStream preparePDF(List<ItemDTO> invalidItems) {
+        return new ByteArrayInputStream(getByteArrayOutputStreamOutOfInvalidItems(invalidItems).toByteArray());
+    }
 
-        Document invalidItemsReport = new Document();
+    private ByteArrayOutputStream getByteArrayOutputStreamOutOfInvalidItems(List<ItemDTO> invalidItems) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-
+        Document invalidItemsReport = new Document();
         try {
             PdfWriter.getInstance(invalidItemsReport, out);
-            invalidItemsReport.open();
-            invalidItemsReport.add(createParagraph(FontFactory.getFont(FontFactory.COURIER, FONT_SIZE, BaseColor.BLACK)));
-            invalidItemsReport.add(Chunk.NEWLINE);
-            PdfPTable table = new PdfPTable(ITEM_VARIABLE_HEADER_QUANTITY);
-            getItemDTOVariableHeaders()
-                    .forEach(headerTitle -> table.addCell(createHeaderCell(headerTitle)));
-            invalidItems.forEach(item -> {
-                table.addCell(createCell(item.getId().toString()));
-                table.addCell(createCell(item.getType()));
-                table.addCell(createCell(item.getQuantity().toString()));
-                table.addCell(createCell(item.getCreated().toString()));
-                table.addCell(createCell(item.getValidUntil().toString()));
-            });
-            invalidItemsReport.add(table);
-            invalidItemsReport.close();
+            writeItemsToPdf(invalidItems, invalidItemsReport);
         } catch (DocumentException e) {
             e.printStackTrace();
         }
-        return new ByteArrayInputStream(out.toByteArray());
+        return out;
     }
 
-    private Paragraph createParagraph(Font font) {
+    private void writeItemsToPdf(List<ItemDTO> invalidItems, Document invalidItemsReport) throws DocumentException {
+        invalidItemsReport.open();
+        invalidItemsReport.add(getHeaderName(FontFactory.getFont(FontFactory.COURIER, FONT_SIZE, BaseColor.BLACK)));
+        invalidItemsReport.add(Chunk.NEWLINE);
+        invalidItemsReport.add(getPdfPTable(invalidItems));
+        invalidItemsReport.close();
+    }
+
+    private PdfPTable getPdfPTable(List<ItemDTO> invalidItems) {
+        PdfPTable table = new PdfPTable(ITEM_VARIABLE_HEADER_QUANTITY);
+        getItemDTOVariableHeaders().forEach(headerTitle -> table.addCell(createHeaderCell(headerTitle)));
+        invalidItems.forEach(item -> {
+            table.addCell(createCell(item.getId().toString()));
+            table.addCell(createCell(item.getType()));
+            table.addCell(createCell(item.getQuantity().toString()));
+            table.addCell(createCell(item.getCreated().toString()));
+            table.addCell(createCell(item.getValidUntil().toString()));
+        });
+        return table;
+    }
+
+    private Paragraph getHeaderName(Font font) {
         Paragraph paragraph = new Paragraph("Invalid Items Report of " + LocalDate.now(), font);
         paragraph.setAlignment(Element.ALIGN_CENTER);
         return paragraph;
