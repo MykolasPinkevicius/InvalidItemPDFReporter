@@ -19,8 +19,8 @@ public class ItemDTO implements Serializable {
         this.validUntil = validUntil;
     }
 
-    public ItemDTO() {}
-
+    public ItemDTO() {
+    }
 
 
     public Long getId() {
