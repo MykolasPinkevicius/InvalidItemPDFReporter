@@ -19,6 +19,7 @@ public class PDFReportCreator {
     private static final int FONT_SIZE = 14;
     private static final int ITEM_VARIABLE_HEADER_QUANTITY = 5;
     private static final int BORDER_WIDTH = 2;
+    private static final String[] ITEM_VARIABLES_NAMES_FOR_HEADER = {"ID", "Type", "Quantity", "Created", "ValidUntil"};
 
     public ByteArrayInputStream preparePDF(List<ItemDTO> invalidItems) {
         return new ByteArrayInputStream(getByteArrayOutputStreamOutOfInvalidItems(invalidItems).toByteArray());
@@ -83,6 +84,6 @@ public class PDFReportCreator {
     }
 
     private Stream<String> getItemDTOVariableHeaders() {
-        return Stream.of("ID", "Type", "Quantity", "Created", "ValidUntil");
+        return Stream.of(ITEM_VARIABLES_NAMES_FOR_HEADER);
     }
 }
