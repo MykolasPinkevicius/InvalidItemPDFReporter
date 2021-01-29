@@ -11,8 +11,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
@@ -28,20 +28,22 @@ public class InvalidItemPDFReportServiceTest {
     private InvalidItemPDFReportService invalidItemPDFReportService;
 
     private LocalDate validDate;
-    private final List<ItemDTO> invalidItems = new ArrayList<>();
+    private  Optional<ItemDTO[]> invalidItems;
+    private final ItemDTO[] mockedItems = new ItemDTO[1];
 
     @Before
     public void setup() {
         validDate = LocalDate.now();
-        invalidItems.add(new ItemDTO());
+        mockedItems[0] = new ItemDTO();
+        invalidItems = Optional.of(mockedItems);
     }
 
     @Test
     public void shouldCallTwoMethodsOnceWhenCreatingPdfReport() {
-        when(itemDTOService.invalidItems(validDate)).thenReturn(invalidItems);
-        when(pdfReportCreator.preparePDF(invalidItems)).thenReturn(mock(ByteArrayInputStream.class));
+        when(itemDTOService.getInvalidItemsFromItemStock(validDate)).thenReturn(invalidItems);
+        when(pdfReportCreator.preparePDF(Arrays.asList(invalidItems.get()))).thenReturn(mock(ByteArrayInputStream.class));
         invalidItemPDFReportService.getInvalidItems(validDate);
-        verify(itemDTOService, times(1)).invalidItems(validDate);
-        verify(pdfReportCreator, times(1)).preparePDF(invalidItems);
+        verify(itemDTOService, times(1)).getInvalidItemsFromItemStock(validDate);
+        verify(pdfReportCreator, times(1)).preparePDF(Arrays.asList(invalidItems.get()));
     }
 }
