@@ -3,7 +3,7 @@
 Spring Boot system which Uses ItemStock services to get Invalid Items
 
 # To Access Services
-Out server, or Localhost:9090 for this instance, following by "/report/" and service with parameters
+Our server, or Localhost:9090 for this instance, following by "/report/" and service with parameters
 http://localhost:9090/report/service?parameters
 
 | Service | Parameters | return type |
